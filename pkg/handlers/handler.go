@@ -49,6 +49,16 @@ func GetUser(req events.APIGatewayProxyRequest, tableName string, dynaClient dyn
 	}
 	return apiResponse(http.StatusOK, result)
 }
+func UpdateUser(req events.APIGatewayProxyRequest, tableName string, dynaClient dynamodbiface.DynamoDBAPI) (*events.APIGatewayProxyResponse, error) {
+	result, err := user.UpdateUser(req, tableName, dynaClient)
+	if err != nil {
+		fmt.Println(err)
+		return apiResponse(http.StatusBadRequest, ErrorBody{
+			aws.String(err.Error()),
+		})
+	}
+	return apiResponse(http.StatusCreated, result)
+}
 
 
 func UnhandledMethod(_ events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {

@@ -38,6 +38,8 @@ func handler(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse
 		return handlers.CreateUser(req, tableName, dynaClient)
 	case "GET":
 		return handlers.GetUser(req, tableName, dynaClient)
+	case "PUT":
+		return handlers.UpdateUser(req, tableName, dynaClient)
 	default:
 		return handlers.UnhandledMethod(req)
 	}
