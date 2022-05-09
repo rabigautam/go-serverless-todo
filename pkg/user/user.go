@@ -145,3 +145,28 @@ func UpdateUser(req events.APIGatewayProxyRequest, tablename string, dynaClient 
 	}
 	return &u, nil
 }
+
+func DeleteUser(req events.APIGatewayProxyRequest, tablename string, dynaClient dynamodbiface.DynamoDBAPI) error {
+	email := req.QueryStringParameters["email"]
+
+	_, err := FetchUser(email, tablename, dynaClient)
+	if err != nil {
+		fmt.Println(err)
+		return errors.New(ErrorUserDoesNotExist)
+	}
+
+	input := &dynamodb.DeleteItemInput{
+		Key: map[string]*dynamodb.AttributeValue{
+			"email": {
+				S: aws.String(email),
+			},
+		},
+		TableName: aws.String(tablename),
+	}
+	_, err = dynaClient.DeleteItem(input)
+	if err != nil {
+		fmt.Println(err)
+		return errors.New(ErrorCouldNotDeleteItem)
+	}
+	return nil
+}
