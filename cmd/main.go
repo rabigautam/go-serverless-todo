@@ -34,10 +34,10 @@ const tableName = "TableDDB"
 
 func handler(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	switch req.HTTPMethod {
-
 	case "POST":
 		return handlers.CreateUser(req, tableName, dynaClient)
-
+	case "GET":
+		return handlers.GetUser(req, tableName, dynaClient)
 	default:
 		return handlers.UnhandledMethod(req)
 	}

@@ -70,6 +70,7 @@ func CreateUser(req events.APIGatewayProxyRequest, tablename string, dynaClient 
 	}
 	return &u, nil
 }
+
 func FetchUser(email string, tablename string, dynaClient dynamodbiface.DynamoDBAPI) (*User, error) {
 	input := &dynamodb.GetItemInput{
 		Key: map[string]*dynamodb.AttributeValue{
@@ -92,6 +93,27 @@ func FetchUser(email string, tablename string, dynaClient dynamodbiface.DynamoDB
 		return nil, errors.New(ErrorFailedToFetched)
 	}
 	return item, nil
+
+}
+
+func FetchUsers(tablename string, dynaClient dynamodbiface.DynamoDBAPI) (*[]User, error) {
+
+	input := &dynamodb.ScanInput{
+		TableName: aws.String(tablename),
+	}
+	result, err := dynaClient.Scan(input)
+	if err != nil {
+		fmt.Println(err)
+		return nil, errors.New(ErrorFailedToFetched)
+	}
+	items := new([]User)
+	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, items)
+	if err != nil {
+		fmt.Println(err)
+		return nil, errors.New(ErrorFailedToFetched)
+	}
+
+	return items, nil
 
 }
 

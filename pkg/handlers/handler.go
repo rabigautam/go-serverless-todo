@@ -28,7 +28,27 @@ func CreateUser(req events.APIGatewayProxyRequest, tableName string, dynaClient 
 	return apiResponse(http.StatusCreated, result)
 
 }
-
+func GetUser(req events.APIGatewayProxyRequest, tableName string, dynaClient dynamodbiface.DynamoDBAPI) (*events.APIGatewayProxyResponse, error) {
+	email := req.QueryStringParameters["email"]
+	if len(email) > 0 {
+		result, err := user.FetchUser(email, tableName, dynaClient)
+		if err != nil {
+			fmt.Println(err)
+			return apiResponse(http.StatusBadRequest, ErrorBody{
+				aws.String(err.Error()),
+			})
+		}
+		return apiResponse(http.StatusOK, result)
+	}
+	result, err := user.FetchUsers(tableName, dynaClient)
+	if err != nil {
+		fmt.Println(err)
+		return apiResponse(http.StatusInternalServerError, ErrorBody{
+			aws.String(err.Error()),
+		})
+	}
+	return apiResponse(http.StatusOK, result)
+}
 
 
 func UnhandledMethod(_ events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
